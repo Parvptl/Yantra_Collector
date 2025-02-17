@@ -42,7 +42,10 @@ class YantraCollector:
             self.revealed_yantra = None
 
     def goal_test(self, position):
-        return position == self.revealed_yantra or position == self.exit
+        if self.collected_yantras<len(self.yantras):
+            return position == self.revealed_yantra
+            
+        return position == self.exit
 
     def get_neighbors(self, position):
         i, j = position
@@ -56,36 +59,34 @@ class YantraCollector:
         
         return neighbors
     
-    def bfs(self, start, goal):
-        queue = [(start, [])]
-        explored = []
-        
+    def bfs(self):
+        if self.collected_yantras==0 :
+            queue = [(self.start, [])]
+        else:
+            queue = [(self.yantras[self.collected_yantras],[])]
+        explored = []        
         
         while queue:
-            (current, path) = queue.pop(0)
-            
-
-            # if current in explored:
-            #     continue
-            
+            (current, path) = queue.pop(0)           
             explored.append(current)
-            print(explored)
             new_path = path + [current]
             
-            if current == goal:
-
+            if self.goal_test(current):
                 return new_path, len(queue), len(explored)
             
             for neighbor in self.get_neighbors(current):
                 if neighbor not in explored and neighbor not in [i[0] for i in queue]:
-                    # print(neighbor)
                     queue.append((neighbor, new_path))
                     
         
         return None, len(queue), len(explored)
     
-    def dfs(self, start, goal):
-        stack = [(start, [])]
+    def dfs(self):
+        if self.collected_yantras==0 :
+            stack = [(self.start, [])]
+        else:
+            stack = [(self.yantras[self.collected_yantras],[])]
+    
         explored = []
     
         
@@ -94,11 +95,9 @@ class YantraCollector:
             if current in explored:
                 continue
             explored.append(current)
-
-            print(explored)
             new_path = path + [current]
             
-            if current == goal:
+            if self.goal_test(current):
                 return new_path, len(stack), len(explored)
             
             for neighbor in reversed(self.get_neighbors(current)):
@@ -112,11 +111,9 @@ class YantraCollector:
         path = []
         while self.collected_yantras != len(self.yantras)+1:
             if strategy == "BFS":
-                p1, fn1, fn2 = self.bfs(self.start, self.revealed_yantra)
-                print(fn2)
+                p1, fn1, fn2 = self.bfs()
             else:
-                p1, fn1, fn2 = self.dfs(self.start, self.revealed_yantra)
-                print(fn2)
+                p1, fn1, fn2 = self.dfs()
             if p1:
                 path.extend(p1[0:len(p1)-1])
             else:
@@ -142,7 +139,7 @@ if __name__ == "__main__":
     ]
 
     game = YantraCollector(grid)
-    strategy =   "BFS"
+    strategy =   "DFS"
     solution, total_frontier, total_explored = game.solve(strategy)
 
     if solution:
