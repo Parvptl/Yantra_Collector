@@ -111,16 +111,16 @@ class YantraCollector:
         path = []
         while self.collected_yantras != len(self.yantras)+1:
             if strategy == "BFS":
-                p1, fn1, fn2 = self.bfs()
+                p1, fn, en = self.bfs()
             else:
-                p1, fn1, fn2 = self.dfs()
+                p1, fn, en = self.dfs()
             if p1:
                 path.extend(p1[0:len(p1)-1])
             else:
                 return None, self.total_frontier_nodes, self.total_explored_nodes
 
-            self.total_frontier_nodes += fn1
-            self.total_explored_nodes += fn2
+            self.total_frontier_nodes += fn
+            self.total_explored_nodes += en
 
             self.start = self.revealed_yantra
             self.reveal_next_yantra_or_exit()
